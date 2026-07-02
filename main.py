@@ -71,6 +71,15 @@ if config.has_section("EXCLUIDOS") and "carpetas" in config["EXCLUIDOS"]:
 if not MOSTRAR_CONSOLA:
     sys.stdout = open(os.devnull, "w")
 
+    # Oculta la ventana de la consola (no solo su contenido). Solo se aplica al
+    # .exe empaquetado: si se ejecuta como script desde una terminal ya abierta,
+    # el proceso se adjunta a esa misma consola y ocultarla ocultaria la terminal.
+    if platform.system() == "Windows" and getattr(sys, "frozen", False):
+        import ctypes
+        consola_hwnd = ctypes.windll.kernel32.GetConsoleWindow()
+        if consola_hwnd:
+            ctypes.windll.user32.ShowWindow(consola_hwnd, 0)  # SW_HIDE
+
 # ============================
 # CONFIGURACIÓN FIJA
 # ============================
@@ -371,8 +380,15 @@ def setup_tray_icon(gui):
         pystray.MenuItem("Salir", quit_app),
     )
 
+    def on_setup(icon):
+        icon.visible = True
+        try:
+            icon.notify("Se inició Mondisk", "Mondisk")
+        except Exception:
+            pass
+
     tray_icon = pystray.Icon("mondisk", image, "Mondisk Monitor", menu)
-    threading.Thread(target=tray_icon.run, daemon=True).start()
+    threading.Thread(target=tray_icon.run, kwargs={"setup": on_setup}, daemon=True).start()
     return tray_icon
 
 # ============================

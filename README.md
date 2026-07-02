@@ -49,7 +49,7 @@ El ícono de la bandeja del sistema permite mostrar/ocultar el widget o salir de
 | `FUENTE` | `familia` | Familia tipográfica del texto de las rutas. |
 | `FUENTE` | `tamano` | Tamaño de fuente del texto de las rutas. |
 | `VENTANA` | `minimizar_modo` | `detener` (cierra la app), `ocultar`/`barra_tareas` (oculta el widget; se restaura desde el ícono de bandeja). |
-| `VENTANA` | `mostrar_consola` | `si`/`no`. Si es `no`, se silencia la salida por consola (la ventana de consola en sí depende de cómo se compiló el `.exe`, ver más abajo). |
+| `VENTANA` | `mostrar_consola` | `si`/`no`. Si es `no`, la ventana de consola del `.exe` se oculta por completo al arrancar (no solo su contenido) y solo queda el ícono de bandeja; se muestra una notificación "Se inició Mondisk" como confirmación. Al ejecutarse como script desde una terminal ya abierta, este ocultamiento no se aplica (evita ocultar la terminal del usuario). |
 | `ALARMAS` | `sonido_activado` | `si`/`no`. |
 | `ALARMAS` | `archivo_sonido` | Ruta al `.wav` de la alarma (relativa al `.exe`/script, o absoluta). |
 | `ALARMAS` | `repetir` | Si repite el sonido varias veces al dispararse. |
