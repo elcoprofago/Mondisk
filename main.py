@@ -19,10 +19,27 @@ if platform.system() == "Windows":
     import winsound
 
 # ============================
+# RUTAS (fuente vs. .exe empaquetado con PyInstaller)
+# ============================
+def resource_path(relative_path):
+    """Ruta a un recurso empaquetado dentro del .exe (icon.ico, alarma.wav)."""
+    base_path = getattr(sys, "_MEIPASS", os.path.dirname(os.path.abspath(__file__)))
+    return os.path.join(base_path, relative_path)
+
+
+def external_path(relative_path):
+    """Ruta a un archivo editable junto al .exe (o al script), ej. config.ini."""
+    if getattr(sys, "frozen", False):
+        base_path = os.path.dirname(sys.executable)
+    else:
+        base_path = os.path.dirname(os.path.abspath(__file__))
+    return os.path.join(base_path, relative_path)
+
+# ============================
 # LEER CONFIGURACIÓN
 # ============================
 config = configparser.ConfigParser(inline_comment_prefixes=(";",))
-config.read("config.ini")
+config.read(external_path("config.ini"))
 
 UMBRAL_GB = float(config["GENERAL"]["umbral_gb"])
 CICLO_MINUTOS = max(float(config["GENERAL"]["ciclo_minutos"]), 0.1)
@@ -42,6 +59,8 @@ MOSTRAR_CONSOLA = config["VENTANA"]["mostrar_consola"].split()[0].lower() == "si
 
 SONIDO_ACTIVADO = config["ALARMAS"]["sonido_activado"].split()[0].lower() == "si"
 ARCHIVO_SONIDO = config["ALARMAS"]["archivo_sonido"]
+if ARCHIVO_SONIDO and not os.path.isabs(ARCHIVO_SONIDO):
+    ARCHIVO_SONIDO = resource_path(ARCHIVO_SONIDO)
 REPETIR_SONIDO = config["ALARMAS"]["repetir"].split()[0].lower() == "si"
 SOLO_IMPORTANTES = config["ALARMAS"]["solo_importantes"].split()[0].lower() == "si"
 
@@ -150,7 +169,7 @@ class MonitorGUI:
 
         self.window = tk.Toplevel(self.root)
         try:
-            self.window.iconphoto(False, tk.PhotoImage(file="icon.ico"))
+            self.window.iconphoto(False, tk.PhotoImage(file=resource_path("icon.ico")))
         except:
             pass
         self.window.overrideredirect(True)
@@ -329,7 +348,7 @@ class MonitorGUI:
 # ============================
 def setup_tray_icon(gui):
     try:
-        image = Image.open("icon.ico")
+        image = Image.open(resource_path("icon.ico"))
     except Exception:
         image = Image.new("RGB", (64, 64), color="#9f9df2")
 
@@ -400,7 +419,7 @@ if __name__ == "__main__":
 
     root = tk.Tk()
     try:
-        root.iconphoto(False, tk.PhotoImage(file="icon.ico"))
+        root.iconphoto(False, tk.PhotoImage(file=resource_path("icon.ico")))
     except:
         pass
     root.withdraw()
