@@ -382,12 +382,16 @@ def monitor_thread(gui, root_path, threshold_gb, ciclo_minutos):
     last_sizes = {}
     intervalo = ciclo_minutos * 60
     first_pass = True
+    root_normalizado = os.path.normpath(root_path)
 
     while True:
         sizes = compute_all_sizes(root_path)
 
         if not first_pass:
             for current_path, current_size in sizes.items():
+                if os.path.normpath(current_path) == root_normalizado:
+                    continue
+
                 previous = last_sizes.get(current_path)
                 if previous is None:
                     continue
