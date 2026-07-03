@@ -11,6 +11,8 @@ En cada ciclo, `main.py` recorre recursivamente la carpeta raíz configurada (`r
 
 El primer ciclo después de arrancar solo establece la línea base — no dispara alarmas — porque no hay un tamaño anterior con el cual comparar.
 
+Como el tamaño de una carpeta incluye el de sus subcarpetas, un cambio en una carpeta profunda se propaga hacia arriba por toda la cadena de ancestros (si crece `C:\Users\Rodolfo\AppData\Local\Temp\PDF24`, también "crecen" `Temp`, `Local`, `AppData`, `Rodolfo` y `Users`). Para evitar reportar toda esa cadena, la carpeta raíz nunca se reporta a sí misma, y de cada cadena de carpetas cambiadas solo se muestra la más específica — sus ancestros quedan implícitos en ese aviso.
+
 ## Requisitos
 
 - Windows (usa `winsound` y la bandeja del sistema de Windows).

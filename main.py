@@ -404,6 +404,7 @@ def monitor_thread(gui, root_path, threshold_gb, ciclo_minutos):
         sizes = compute_all_sizes(root_path)
 
         if not first_pass:
+            candidatos = {}
             for current_path, current_size in sizes.items():
                 if os.path.normpath(current_path) == root_normalizado:
                     continue
@@ -413,12 +414,22 @@ def monitor_thread(gui, root_path, threshold_gb, ciclo_minutos):
                     continue
 
                 diff_gb = (current_size - previous) / GB
-
                 if abs(diff_gb) >= threshold_gb:
-                    gui.root.after(0, gui.draw_row, current_path, previous, current_size)
+                    candidatos[current_path] = (previous, current_size, diff_gb)
 
-                    if SONIDO_ACTIVADO and (not SOLO_IMPORTANTES or abs(diff_gb) >= threshold_gb):
-                        play_alarm()
+            # El tamano de una carpeta incluye el de sus subcarpetas, asi que
+            # un cambio profundo se propaga hacia arriba por toda la cadena de
+            # ancestros. Solo se reporta la carpeta mas especifica de cada
+            # cadena; sus ancestros quedan implicitos en ese aviso.
+            for path, (previous, current_size, diff_gb) in candidatos.items():
+                prefix = path.rstrip(os.sep) + os.sep
+                if any(otro != path and otro.startswith(prefix) for otro in candidatos):
+                    continue
+
+                gui.root.after(0, gui.draw_row, path, previous, current_size)
+
+                if SONIDO_ACTIVADO and (not SOLO_IMPORTANTES or abs(diff_gb) >= threshold_gb):
+                    play_alarm()
 
         last_sizes = sizes
         first_pass = False
